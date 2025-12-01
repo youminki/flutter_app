@@ -1,5 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+
+import '../styles/styles.dart';
+import '../services/auth_service.dart';
+import '../widgets/logo.dart';
+import '../widgets/email_field.dart';
+import '../widgets/password_field.dart';
+import '../widgets/password_rules.dart';
+import '../widgets/auth_button.dart';
+
+// 로그인 화면
+// - 입력 컴포넌트를 조합하여 화면 구성
+// - 실제 인증은 `AuthService`로 분리(현재는 모의 인증)
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -9,100 +20,85 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // 폼 키 및 입력 컨트롤러
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _loading = false;
-  bool _obscure = true;
-  bool _keepLoggedIn = false;
+  // UI 상태
+  bool _loading = false; // 로그인 처리 중 로딩 표시
+  bool _keepLoggedIn = false; // 로그인 유지 여부
 
   @override
   void dispose() {
+    // 컨트롤러 해제
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
+    // 폼 검증 후 인증 시도 (AuthService 사용)
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _loading = true);
-    // 모의 인증: 이메일이 test@example.com 이고 비밀번호가 1234 라면 성공
-    await Future.delayed(const Duration(milliseconds: 600));
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-
-    if (email == 'test@example.com' && password == '1234') {
-      if (!mounted) return;
+    final ok = await AuthService.authenticate(email: email, password: password);
+    if (!mounted) return;
+    if (ok) {
       Navigator.of(context).pushReplacementNamed('/home');
-    } else {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('로그인 정보가 올바르지 않습니다.')));
+      return;
     }
-
-    if (mounted) setState(() => _loading = false);
+    setState(() => _loading = false);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('로그인 정보가 올바르지 않습니다.')));
   }
 
   @override
   Widget build(BuildContext context) {
-    final fillColor = Colors.blue.shade50;
-
+    // 공통 색상/간격은 `AppColors` / `AppSpacing` 사용
     return Scaffold(
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: 32,
+            ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Logo / Title
-                  Column(
-                    children: [
-                      // SVG logo (falls back to text if asset missing)
-                      SizedBox(
-                        height: 80,
-                        child: SvgPicture.asset(
-                          'assets/LoginLogo.Bp1AByLd.svg',
-                          fit: BoxFit.contain,
+                  // 로고 표시
+                  const Logo(),
+                  const SizedBox(height: AppSpacing.lg),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                      children: [
+                        const TextSpan(text: '이젠 '),
+                        TextSpan(
+                          text: '멜픽',
+                          style: TextStyle(color: AppColors.accent),
                         ),
-                      ),
-                      const SizedBox(height: 18),
-                      // Headings
-                      RichText(
-                        textAlign: TextAlign.center,
-                        text: TextSpan(
-                          style: Theme.of(context).textTheme.titleLarge
-                              ?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black,
-                              ),
-                          children: [
-                            const TextSpan(text: '이젠 '),
-                            TextSpan(
-                              text: '멜픽',
-                              style: TextStyle(color: Colors.orange.shade700),
-                            ),
-                            const TextSpan(text: '을 통해\n브랜드를 골라보세요'),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '사고, 팔고, 빌리는 것을 한번에!',
-                        textAlign: TextAlign.center,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(color: Colors.black54),
-                      ),
-                      const SizedBox(height: 28),
-                    ],
+                        const TextSpan(text: '을 통해\n브랜드를 골라보세요'),
+                      ],
+                    ),
                   ),
-
-                  // Form
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    '사고, 팔고, 빌리는 것을 한번에!',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: AppColors.muted),
+                  ),
+                  const SizedBox(height: 28),
                   Card(
                     elevation: 0,
                     color: Colors.transparent,
@@ -111,97 +107,18 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          // Email
-                          TextFormField(
+                          EmailField(
                             controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: fillColor,
-                              hintText: '이메일',
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 16,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide.none,
-                              ),
-                              suffixIcon: _emailController.text.isEmpty
-                                  ? null
-                                  : IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () => setState(
-                                        () => _emailController.clear(),
-                                      ),
-                                    ),
-                            ),
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return '이메일을 입력하세요.';
-                              }
-                              if (!v.contains('@')) {
-                                return '유효한 이메일을 입력하세요.';
-                              }
-                              return null;
-                            },
-                            onChanged: (_) => setState(() {}),
+                            fillColor: AppColors.fill,
                           ),
-                          const SizedBox(height: 12),
-
-                          // Password
-                          TextFormField(
+                          const SizedBox(height: 4),
+                          PasswordField(
                             controller: _passwordController,
-                            obscureText: _obscure,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: fillColor,
-                              hintText: '비밀번호',
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 16,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(6),
-                                borderSide: BorderSide.none,
-                              ),
-                              suffixIcon: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  if (_passwordController.text.isNotEmpty)
-                                    IconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: () => setState(
-                                        () => _passwordController.clear(),
-                                      ),
-                                    ),
-                                  IconButton(
-                                    icon: Icon(
-                                      _obscure
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                    onPressed: () =>
-                                        setState(() => _obscure = !_obscure),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            validator: (v) {
-                              if (v == null || v.isEmpty) {
-                                return '비밀번호를 입력하세요.';
-                              }
-                              if (v.length < 4) {
-                                return '최소 4자 이상 입력하세요.';
-                              }
-                              return null;
-                            },
-                            onChanged: (_) => setState(() {}),
+                            fillColor: AppColors.fill,
                           ),
-
+                          const SizedBox(height: 8),
+                          PasswordRules(controller: _passwordController),
                           const SizedBox(height: 12),
-
-                          // Keep logged in row
                           Row(
                             children: [
                               Checkbox(
@@ -213,42 +130,9 @@ class _LoginPageState extends State<LoginPage> {
                               const Expanded(child: Text('로그인 상태 유지 (선택)')),
                             ],
                           ),
-
                           const SizedBox(height: 8),
-
-                          // Login button
-                          SizedBox(
-                            height: 52,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                              ),
-                              onPressed: _loading ? null : _submit,
-                              child: _loading
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Text(
-                                      '로그인',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                            ),
-                          ),
-
+                          AuthButton(loading: _loading, onPressed: _submit),
                           const SizedBox(height: 18),
-
-                          // Footer links
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
