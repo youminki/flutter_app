@@ -8,11 +8,13 @@ class AuthButton extends StatelessWidget {
     required this.loading,
     required this.onPressed,
     this.label = '로그인',
+    this.color,
   });
 
   final bool loading;
   final VoidCallback onPressed;
   final String label;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,7 @@ class AuthButton extends StatelessWidget {
       height: 52,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: color ?? AppColors.primary,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
         ),
         onPressed: loading ? null : onPressed,

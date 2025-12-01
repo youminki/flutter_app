@@ -6,7 +6,8 @@ class AppColors {
 
   // 버튼/강조 색상
   static const Color primary = Color(0xFF000000); // 검정
-  static Color accent = Colors.orange.shade700; // 강조 색
+  // 메인 컬러: rgb(246,174,36) -> #F6AE24
+  static const Color accent = Color(0xFFF6AE24); // 강조 색
 
   // 입력 채우기 배경
   static Color fill = Colors.blue.shade50;

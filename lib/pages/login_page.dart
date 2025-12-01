@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../styles/styles.dart';
 import '../services/auth_service.dart';
 import '../widgets/logo.dart';
+import '../widgets/form_card.dart';
 import '../widgets/email_field.dart';
 import '../widgets/password_field.dart';
 import '../widgets/auth_button.dart';
@@ -98,58 +99,55 @@ class _LoginPageState extends State<LoginPage> {
                     ).textTheme.bodyMedium?.copyWith(color: AppColors.muted),
                   ),
                   const SizedBox(height: 28),
-                  Card(
-                    elevation: 0,
-                    color: Colors.transparent,
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          EmailField(
-                            controller: _emailController,
-                            fillColor: AppColors.fill,
-                          ),
-                          const SizedBox(height: 4),
-                          PasswordField(
-                            controller: _passwordController,
-                            fillColor: AppColors.fill,
-                          ),
-                          const SizedBox(height: 8),
-                          const SizedBox(height: 12),
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _keepLoggedIn,
-                                onChanged: (v) =>
-                                    setState(() => _keepLoggedIn = v ?? false),
-                              ),
-                              const SizedBox(width: 6),
-                              const Expanded(child: Text('로그인 상태 유지 (선택)')),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          AuthButton(loading: _loading, onPressed: _submit),
-                          const SizedBox(height: 18),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text('아이디 찾기'),
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text('비밀번호 찾기'),
-                              ),
-                              TextButton(
-                                onPressed: () {},
-                                child: const Text('회원가입 (이메일)'),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                  FormCard(
+                    formKey: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        EmailField(
+                          controller: _emailController,
+                          fillColor: AppColors.fill,
+                        ),
+                        const SizedBox(height: 4),
+                        PasswordField(
+                          controller: _passwordController,
+                          fillColor: AppColors.fill,
+                        ),
+                        const SizedBox(height: 8),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _keepLoggedIn,
+                              onChanged: (v) =>
+                                  setState(() => _keepLoggedIn = v ?? false),
+                            ),
+                            const SizedBox(width: 6),
+                            const Expanded(child: Text('로그인 상태 유지 (선택)')),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        AuthButton(loading: _loading, onPressed: _submit),
+                        const SizedBox(height: 18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton(
+                              onPressed: () =>
+                                  Navigator.of(context).pushNamed('/find-id'),
+                              child: const Text('아이디 찾기'),
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: const Text('비밀번호 찾기'),
+                            ),
+                            TextButton(
+                              onPressed: () {},
+                              child: const Text('회원가입 (이메일)'),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
