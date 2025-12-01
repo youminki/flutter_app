@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../styles/styles.dart';
+import '../services/auth_service.dart';
 
 /// 비밀번호 규칙 실시간 표시
 class PasswordRules extends StatelessWidget {
@@ -9,45 +9,39 @@ class PasswordRules extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget rule(bool ok, String text) => Row(
-      children: [
-        Icon(
-          ok ? Icons.check_circle : Icons.close,
-          size: 14,
-          color: ok ? AppColors.success : AppColors.muted,
-        ),
-        const SizedBox(width: 6),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            color: ok ? AppColors.success : AppColors.muted,
-          ),
-        ),
-      ],
-    );
-
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: controller,
       builder: (context, value, _) {
         final pwd = value.text;
         if (pwd.isEmpty) return const SizedBox.shrink();
-        final lenOk = pwd.length >= 8;
-        final upper = pwd.contains(RegExp(r'[A-Z]'));
-        final lower = pwd.contains(RegExp(r'[a-z]'));
-        final digit = pwd.contains(RegExp(r'[0-9]'));
-        final special = pwd.contains(RegExp(r'[!@#\$%\^&*(),.?":{}|<>]'));
+        final errs = AuthService.passwordValidationErrors(pwd);
+        if (errs.isEmpty) return const SizedBox.shrink();
+        final first = errs.first;
+        // 간단한 애니메이션과 빨간 강조로 첫 실패 항목 표시
         return Padding(
           padding: const EdgeInsets.only(bottom: 8.0, left: 4),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              rule(lenOk, '8자 이상'),
-              rule(upper, '대문자 포함'),
-              rule(lower, '소문자 포함'),
-              rule(digit, '숫자 포함'),
-              rule(special, '특수문자 포함 (!@#...)'),
-            ],
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Row(
+              key: ValueKey(first),
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 16,
+                  color: Colors.redAccent,
+                ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    first,
+                    style: const TextStyle(
+                      color: Colors.redAccent,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
