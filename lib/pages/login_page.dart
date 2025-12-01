@@ -5,7 +5,6 @@ import '../services/auth_service.dart';
 import '../widgets/logo.dart';
 import '../widgets/email_field.dart';
 import '../widgets/password_field.dart';
-import '../widgets/password_rules.dart';
 import '../widgets/auth_button.dart';
 
 // 로그인 화면
@@ -117,7 +116,6 @@ class _LoginPageState extends State<LoginPage> {
                             fillColor: AppColors.fill,
                           ),
                           const SizedBox(height: 8),
-                          PasswordRules(controller: _passwordController),
                           const SizedBox(height: 12),
                           Row(
                             children: [
