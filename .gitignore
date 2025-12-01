@@ -1,0 +1,32 @@
+# Flutter
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache
+.pub/
+.dart_tool/
+# Android
+**/android/.gradle
+**/android/local.properties
+**/android/**/build/
+# iOS
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Runner.xcworkspace/
+**/ios/Runner/GeneratedPluginRegistrant.*
+# macOS, Windows, Linux build outputs
+**/macos/Build/
+**/windows/runner/Release/
+**/linux/runner/
+# Editors
+.idea/
+.vscode/
+*.iml
+# OS
+.DS_Store
+# Keys and secrets
+key/
+Github/
